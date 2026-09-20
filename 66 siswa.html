@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ujian Akhir Semester - SMAN 63 Maluku Tengah</title>
+    <style>
+        :root {
+            --primary: #1e3a8a;
+            --primary-dark: #1e293b;
+            --secondary: #0284c7;
+            --accent: #d97706;
+            --bg: #f8fafc;
+            --card: #ffffff;
+            --text: #1e293b;
+            --border: #cbd5e1;
+            --success: #10b981;
+            --danger: #ef4444;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Arial, sans-serif; }
+        body { background-color: var(--bg); color: var(--text); padding: 15px; line-height: 1.4; font-size: 13px; }
+
+        .container { max-width: 1100px; margin: 0 auto; background: var(--card); padding: 20px; border-radius: 8px; border: 1px solid var(--border); }
+        .kop-header { text-align: center; border-bottom: 3px double var(--primary); padding-bottom: 10px; margin-bottom: 15px; }
+        .kop-header h2 { font-size: 12pt; color: #475569; }
+        .kop-header h1 { font-size: 16pt; color: var(--primary); margin: 3px 0; text-transform: uppercase; }
+        .kop-header p { font-size: 9pt; color: #64748b; font-style: italic; }
+
+        .timer-sticky {
+            position: sticky; top: 10px; z-index: 100; background: var(--primary); color: white;
+            padding: 8px 15px; border-radius: 6px; display: flex; justify-content: space-between; align-items: center; font-weight: bold; margin-bottom: 15px;
+        }
+
+        .card-section { background: #f8fafc; padding: 15px; border-radius: 6px; margin-bottom: 15px; border: 1px solid var(--border); }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+        .form-group { display: flex; flex-direction: column; gap: 3px; }
+        .form-group label { font-size: 0.85em; font-weight: 600; }
+        .form-group input, .form-group select { padding: 6px; border: 1px solid var(--border); border-radius: 4px; }
+
+        .tab-nav { display: flex; gap: 8px; margin-bottom: 15px; border-bottom: 2px solid var(--border); padding-bottom: 8px; flex-wrap: wrap; }
+        .tab-btn { padding: 8px 14px; border: none; background: #e2e8f0; color: #475569; font-weight: 600; border-radius: 4px; cursor: pointer; }
+        .tab-btn.active { background: var(--primary); color: white; }
+
+        .question-card { background: white; border: 1px solid var(--border); border-radius: 6px; padding: 12px; margin-bottom: 10px; }
+        .options-group { display: flex; flex-direction: column; gap: 5px; margin-top: 5px; }
+        .option-label { display: flex; align-items: center; gap: 8px; padding: 6px; border: 1px solid #f1f5f9; border-radius: 4px; cursor: pointer; background: #fafafa; }
+
+        .matching-table { width: 100%; border-collapse: collapse; margin-top: 8px; }
+        .matching-table th, .matching-table td { border: 1px solid var(--border); padding: 6px; text-align: left; }
+
+        .btn { padding: 8px 14px; border: none; border-radius: 4px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-success { background: var(--success); color: white; }
+        .btn-warning { background: var(--accent); color: white; }
+        .btn-secondary { background: #64748b; color: white; }
+
+        .lock-panel { background: #fffbeb; border: 1px dashed var(--accent); padding: 10px; border-radius: 6px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; }
+        .result-box { background: #ecfdf5; border: 1px solid #a7f3d0; padding: 15px; border-radius: 6px; margin-top: 15px; display: none; }
+
+        .input-edit-q { width: 100%; padding: 6px; border: 1px solid var(--border); border-radius: 4px; margin-top: 3px; font-size: 0.9em; }
+
+        .rekap-print-wrapper { width: 100%; overflow-x: auto; }
+        .matrix-table { width: 100%; border-collapse: collapse; font-size: 8pt; background: white; }
+        .matrix-table th, .matrix-table td { border: 1px solid #94a3b8; padding: 3px 2px; text-align: center; }
+        .matrix-table th { background: #e2e8f0; font-weight: bold; }
+        .cell-true { background-color: #dcfce7; color: #15803d; font-weight: bold; }
+        .cell-false { background-color: #fee2e2; color: #b91c1c; font-weight: bold; }
+
+        .siswa-grid-edit { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 8px; max-height: 250px; overflow-y: auto; border: 1px solid var(--border); padding: 10px; background: white; }
+
+        @media print {
+            body { background: white; padding: 0; font-size: 7.5pt; }
+            .container { max-width: 100% !important; border: none; padding: 0; box-shadow: none; }
+            .timer-sticky, .lock-panel, .tab-nav, .action-bar, #examForm > div:not(#sec-rekap), .no-print { display: none !important; }
+            #sec-rekap { display: block !important; }
+            .kop-header { margin-bottom: 8px; padding-bottom: 5px; }
+            .matrix-table th, .matrix-table td { padding: 2px 1px !important; }
+            @page { size: A4 landscape; margin: 0.5cm; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="kop-header">
+        <h2>PEMERINTAH PROVINSI MALUKU</h2>
+        <h1>UJIAN AKHIR SEMESTER SMA NEGERI 63 MALUKU TENGAH</h1>
+        <p>Rekapitulasi Capaian Hasil Belajar Siswa Per Kelas (Bobot PG: 3, Jodoh: 3, B/S: 1)</p>
+    </div>
+
+    <div class="timer-sticky no-print">
+        <span>⏱️ Sisa Waktu Ujian:</span>
+        <span id="timerDisplay">90:00</span>
+    </div>
+
+    <div class="card-section no-print">
+        <h3>📋 Identitas Ujian Siswa</h3>
+        <div class="grid-3">
+            <div class="form-group" style="grid-column: span 2;">
+                <label>Pilih Nama Siswa:</label>
+                <select id="siswaSelect" onchange="autoFillSiswa()">
+                    <option value="">-- Pilih Nama Siswa --</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Kelas:</label>
+                <input type="text" id="siswaKelas" readonly>
+            </div>
+        </div>
+        <div class="grid-3" style="margin-top: 8px;">
+            <div class="form-group">
+                <label>NIS:</label>
+                <input type="text" id="siswaNIS" readonly>
+            </div>
+            <div class="form-group">
+                <label>Mata Pelajaran:</label>
+                <input type="text" id="mapelNama" value="Informatika / TIK">
+            </div>
+            <div class="form-group">
+                <label>Guru Pengampu:</label>
+                <input type="text" id="guruNama" placeholder="Nama Guru Pengampu">
+            </div>
+        </div>
+    </div>
+
+    <div class="lock-panel no-print">
+        <div>
+            <strong>🔒 Panel Akses Guru:</strong> 
+            <span id="lockStatus" style="color: var(--success); font-weight: bold;">TERBUKA</span>
+        </div>
+        <div style="display: flex; gap: 5px;">
+            <button class="btn btn-secondary" onclick="exportDataJSON()">📤 Ekspor Soal</button>
+            <button class="btn btn-secondary" onclick="document.getElementById('importFile').click()">📥 Impor Soal</button>
+            <input type="file" id="importFile" style="display: none;" onchange="importDataJSON(event)">
+        </div>
+    </div>
+
+    <div class="tab-nav no-print">
+        <button class="tab-btn active" id="tabBtnPG" onclick="switchSection('pg', event)">PG (15)</button>
+        <button class="tab-btn" id="tabBtnJodoh" onclick="switchSection('jodoh', event)">Menjodohkan (15)</button>
+        <button class="tab-btn" id="tabBtnBS" onclick="switchSection('bs', event)">Benar/Salah (10)</button>
+        <button class="tab-btn" id="btnTabEdit" onclick="switchSection('edit', event)" style="background: #fef3c7; color: #b45309;">⚙️ Edit Soal & Data Siswa</button>
+        <button class="tab-btn" id="btnTabRekap" onclick="switchSection('rekap', event)" style="background: #dcfce7; color: #15803d;">📊 Rekap Nilai Per Kelas</button>
+    </div>
+
+    <form id="examForm">
+        <div id="sec-pg">
+            <h3 style="margin-bottom: 10px;">Bagian 1: Pilihan Ganda (Bobot = 3 Per Soal)</h3>
+            <div id="container-pg"></div>
+        </div>
+
+        <div id="sec-jodoh" style="display: none;">
+            <h3 style="margin-bottom: 10px;">Bagian 2: Menjodohkan (Bobot = 3 Per Soal)</h3>
+            <table class="matching-table">
+                <thead>
+                    <tr><th width="5%">No</th><th width="45%">Pernyataan</th><th width="50%">Pilihan Jawaban</th></tr>
+                </thead>
+                <tbody id="container-jodoh"></tbody>
+            </table>
+        </div>
+
+        <div id="sec-bs" style="display: none;">
+            <h3 style="margin-bottom: 10px;">Bagian 3: Benar / Salah (Bobot = 1 Per Soal)</h3>
+            <div id="container-bs"></div>
+        </div>
+
+        <div id="sec-edit" style="display: none;">
+            <h3 style="margin-bottom: 10px; color: var(--accent);">⚙️ Input & Edit Soal Ujian Beserta Data Siswa</h3>
+            
+            <div class="card-section">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                    <h4>Kelola Data Siswa (<span id="totalSiswaLabel">66</span> Siswa):</h4>
+                    <button type="button" class="btn btn-warning" onclick="tambahSiswaMutasi()">➕ Tambah Siswa (Mutasi Masuk)</button>
+                </div>
+                <div class="siswa-grid-edit" id="siswaGridEdit"></div>
+                <div style="margin-top: 8px;">
+                    <button type="button" class="btn btn-success" onclick="simpanDaftarSiswa()">💾 Simpan Data Siswa</button>
+                </div>
+            </div>
+
+            <div id="container-edit-soal"></div>
+        </div>
+
+        <div id="sec-rekap" style="display: none;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;" class="no-print">
+                <div>
+                    <label><strong>Filter Rekap Per Kelas:</strong></label>
+                    <select id="filterKelasRekap" onchange="renderRekapTable()" style="padding: 5px; font-weight: bold;">
+                        <option value="ALL">-- Semua Kelas --</option>
+                    </select>
+                </div>
+                <div style="display: flex; gap: 8px;">
+                    <button type="button" class="btn btn-primary" onclick="window.print()">🖨️ Cetak 1 Lembar (Landscape)</button>
+                    <button type="button" class="btn btn-success" onclick="downloadRekapCSV()">📥 Download CSV</button>
+                    <button type="button" class="btn btn-secondary" onclick="resetRekapNilai()">🗑️ Hapus Rekap</button>
+                </div>
+            </div>
+
+            <div style="margin-bottom: 5px;" class="only-print">
+                <strong>Kelas: </strong><span id="printKelasLabel">Semua Kelas</span> | 
+                <strong>Mata Pelajaran: </strong><span id="printMapelLabel">Informatika</span>
+            </div>
+
+            <div class="rekap-print-wrapper">
+                <table class="matrix-table">
+                    <thead>
+                        <tr>
+                            <th rowspan="2" width="3%">No</th>
+                            <th rowspan="2" width="14%">Nama Siswa</th>
+                            <th rowspan="2" width="5%">NIS</th>
+                            <th colspan="15">Soal PG (Bobot 3)</th>
+                            <th colspan="15">Soal Menjodohkan (Bobot 3)</th>
+                            <th colspan="10">Soal B/S (Bobot 1)</th>
+                            <th rowspan="2" width="4%">Total Nilai</th>
+                        </tr>
+                        <tr>
+                            <th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th><th>7</th><th>8</th><th>9</th><th>10</th><th>11</th><th>12</th><th>13</th><th>14</th><th>15</th>
+                            <th>16</th><th>17</th><th>18</th><th>19</th><th>20</th><th>21</th><th>22</th><th>23</th><th>24</th><th>25</th><th>26</th><th>27</th><th>28</th><th>29</th><th>30</th>
+                            <th>31</th><th>32</th><th>33</th><th>34</th><th>35</th><th>36</th><th>37</th><th>38</th><th>39</th><th>40</th>
+                        </tr>
+                    </thead>
+                    <tbody id="rekapTableBody">
+                        <tr><td colspan="44">Belum ada data nilai tersimpan.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div style="margin-top: 15px; display: flex; justify-content: space-between; text-align: center;" class="only-print">
+                <div><p>Kepala SMAN 63 Maluku Tengah</p><br><br><p>__________________________</p></div>
+                <div><p>Guru Pengampu Mapel</p><br><br><p id="printGuruFooter">__________________________</p></div>
+            </div>
+        </div>
+
+        <div class="action-bar no-print" style="margin-top: 15px; display: flex; justify-content: space-between;">
+            <button type="button" class="btn btn-success" onclick="hitungKoreksiHasil()">✅ Selesai & Rekap Hasil Ujian</button>
+        </div>
+    </form>
+
+    <div class="result-box no-print" id="resultBox">
+        <h3 style="text-align: center;">📊 HASIL NILAI SISWA</h3>
+        <hr style="margin: 10px 0;">
+        <p><strong>Nama:</strong> <span id="resNama">-</span> | <strong>Kelas:</strong> <span id="resKelas">-</span> | <strong>NIS:</strong> <span id="resNIS">-</span></p>
+        <div style="font-size: 2em; font-weight: bold; text-align: center; color: var(--success); margin: 10px 0;">
+            NILAI AKHIR: <span id="scorePercentage">0</span> / 100
+        </div>
+        <p><strong>Rincian Nilai:</strong> PG (<span id="scorePG">0</span>x3=<span id="valPG">0</span>) + Jodoh (<span id="scoreJodoh">0</span>x3=<span id="valJodoh">0</span>) + B/S (<span id="scoreBS">0</span>x1=<span id="valBS">0</span>)</p>
+    </div>
+</div>
+
+<script>
+    const OPSI_KELAS = ["Kelas X", "Kelas XI", "Kelas XII"];
+    let daftarSiswa = [];
+    
+    let savedSiswa = localStorage.getItem('daftarSiswaUAS_v8');
+    if (savedSiswa) {
+        daftarSiswa = JSON.parse(savedSiswa);
+    } else {
+        // Default 66 Siswa
+        for (let i = 1; i <= 66; i++) {
+            daftarSiswa.push({ nama: `Siswa No ${i}`, kelas: OPSI_KELAS[i % OPSI_KELAS.length], nis: (202600 + i).toString() });
+        }
+    }
+
+    let examData = {
+        pg: Array.from({length: 15}, (_, i) => ({ id: i + 1, q: `Soal PG Nomor ${i + 1}`, options: ["Pilihan A", "Pilihan B", "Pilihan C", "Pilihan D", "Pilihan E"], key: "A" })),
+        jodoh: Array.from({length: 15}, (_, i) => ({ id: i + 1, left: `Pernyataan Menjodohkan ${i + 1}`, rightOptions: Array.from({length: 15}, (_, j) => `Jawaban ${String.fromCharCode(65 + j)}`), key: String.fromCharCode(65 + i) })),
+        bs: Array.from({length: 10}, (_, i) => ({ id: i + 1, q: `Pernyataan Benar-Salah ${i + 1}`, key: "B" }))
+    };
+
+    let savedExam = localStorage.getItem('examDataUAS_v8');
+    if (savedExam) {
+        examData = JSON.parse(savedExam);
+    }
+
+    let rekapNilaiAll = [];
+    let timerSeconds = 90 * 60;
+
+    window.onload = function() {
+        populateSiswaDropdown();
+        populateFilterKelas();
+        renderExam();
+        renderEditSiswaGrid();
+        renderEditPanel();
+        startTimer();
+        loadRekapFromStorage();
+    };
+
+    function populateSiswaDropdown() {
+        let select = document.getElementById('siswaSelect');
+        select.innerHTML = `<option value="">-- Pilih Nama Siswa (${daftarSiswa.length} Siswa) --</option>`;
+        daftarSiswa.forEach((s, idx) => {
+            select.innerHTML += `<option value="${idx}">${idx + 1}. ${s.nama} - [${s.kelas}] (${s.nis})</option>`;
+        });
+    }
+
+    function populateFilterKelas() {
+        let select = document.getElementById('filterKelasRekap');
+        select.innerHTML = '<option value="ALL">-- Semua Kelas --</option>';
+        OPSI_KELAS.forEach(k => { select.innerHTML += `<option value="${k}">${k}</option>`; });
+    }
+
+    function renderEditSiswaGrid() {
+        let grid = document.getElementById('siswaGridEdit');
+        let labelTotal = document.getElementById('totalSiswaLabel');
+        if(labelTotal) labelTotal.innerText = daftarSiswa.length;
+
+        grid.innerHTML = '';
+        daftarSiswa.forEach((s, idx) => {
+            let optionsHtml = OPSI_KELAS.map(k => `<option value="${k}" ${s.kelas === k ? 'selected':''}>${k}</option>`).join('');
+            grid.innerHTML += `
+                <div style="display: flex; gap: 4px; align-items: center; background: #f8fafc; padding: 4px; border: 1px solid #cbd5e1;">
+                    <span style="font-weight:bold; font-size:0.8em; width:25px;">${idx + 1}.</span>
+                    <input type="text" id="editSiswaNama_${idx}" value="${s.nama}" placeholder="Nama Siswa" style="flex:2; padding:3px; font-size:0.8em;">
+                    <select id="editSiswaKelas_${idx}" style="flex:1; padding:3px; font-size:0.8em;">${optionsHtml}</select>
+                    <input type="text" id="editSiswaNIS_${idx}" value="${s.nis}" placeholder="NIS" style="flex:1; padding:3px; font-size:0.8em;">
+                </div>
+            `;
+        });
+    }
+
+    function tambahSiswaMutasi() {
+        let nextNo = daftarSiswa.length + 1;
+        daftarSiswa.push({
+            nama: `Siswa Mutasi ${nextNo}`,
+            kelas: "Kelas X",
+            nis: (202600 + nextNo).toString()
+        });
+        renderEditSiswaGrid();
+        populateSiswaDropdown();
+    }
+
+    function simpanDaftarSiswa() {
+        daftarSiswa.forEach((_, idx) => {
+            daftarSiswa[idx] = {
+                nama: document.getElementById(`editSiswaNama_${idx}`).value,
+                kelas: document.getElementById(`editSiswaKelas_${idx}`).value,
+                nis: document.getElementById(`editSiswaNIS_${idx}`).value
+            };
+        });
+        localStorage.setItem('daftarSiswaUAS_v8', JSON.stringify(daftarSiswa));
+        populateSiswaDropdown();
+        alert("Data Siswa Berhasil Disimpan!");
+    }
+
+    function autoFillSiswa() {
+        let idx = document.getElementById('siswaSelect').value;
+        if (idx !== "") {
+            document.getElementById('siswaNIS').value = daftarSiswa[idx].nis;
+            document.getElementById('siswaKelas').value = daftarSiswa[idx].kelas;
+        }
+    }
+
+    function startTimer() {
+        setInterval(() => {
+            if (timerSeconds > 0) {
+                timerSeconds--;
+                let m = Math.floor(timerSeconds / 60);
+                let s = timerSeconds % 60;
+                document.getElementById('timerDisplay').innerText = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+            }
+        }, 1000);
+    }
+
+    function renderExam() {
+        let pgContainer = document.getElementById('container-pg');
+        pgContainer.innerHTML = '';
+        examData.pg.forEach((item, idx) => {
+            pgContainer.innerHTML += `
+                <div class="question-card">
+                    <p><strong>${idx + 1}. ${item.q}</strong></p>
+                    <div class="options-group">
+                        ${item.options.map((opt, oIdx) => {
+                            let letter = String.fromCharCode(65 + oIdx);
+                            return `<label class="option-label"><input type="radio" name="pg_${item.id}" value="${letter}"> <strong>${letter}.</strong> ${opt}</label>`;
+                        }).join('')}
+                    </div>
+                </div>
+            `;
+        });
+
+        let jodohContainer = document.getElementById('container-jodoh');
+        jodohContainer.innerHTML = '';
+        examData.jodoh.forEach((item, idx) => {
+            jodohContainer.innerHTML += `
+                <tr>
+                    <td><strong>${idx + 1}</strong></td>
+                    <td>${item.left}</td>
+                    <td>
+                        <select name="jodoh_${item.id}" style="width:100%; padding:4px;">
+                            <option value="">-- Pilih Jawaban --</option>
+                            ${item.rightOptions.map((opt, rIdx) => `<option value="${String.fromCharCode(65 + rIdx)}">[ ${String.fromCharCode(65 + rIdx)} ] ${opt}</option>`).join('')}
+                        </select>
+                    </td>
+                </tr>
+            `;
+        });
+
+        let bsContainer = document.getElementById('container-bs');
+        bsContainer.innerHTML = '';
+        examData.bs.forEach((item, idx) => {
+            bsContainer.innerHTML += `
+                <div class="question-card">
+                    <p><strong>${idx + 1}. ${item.q}</strong></p>
+                    <div style="display:flex; gap:20px; margin-top:5px;">
+                        <label class="option-label" style="flex:1;"><input type="radio" name="bs_${item.id}" value="B"> BENAR (B)</label>
+                        <label class="option-label" style="flex:1;"><input type="radio" name="bs_${item.id}" value="S"> SALAH (S)</label>
+                    </div>
+                </div>
+            `;
+        });
+    }
+
+    function renderEditPanel() {
+        let editContainer = document.getElementById('container-edit-soal');
+        if (!editContainer) return;
+        editContainer.innerHTML = '';
+
+        let html = '<div class="card-section"><h4>1. Edit Teks Soal & Kunci Pilihan Ganda (15 Soal)</h4>';
+        examData.pg.forEach((item, idx) => {
+            html += `
+                <div class="question-card" style="border-left: 3px solid var(--primary);">
+                    <strong>Soal PG No ${idx + 1}:</strong>
+                    <input type="text" class="input-edit-q" value="${item.q}" onchange="examData.pg[${idx}].q = this.value; saveExamState();">
+                    <div class="grid-2" style="margin-top:5px;">
+                        ${item.options.map((opt, oIdx) => `
+                            <div>
+                                <label style="font-size:0.8em;">Opsi ${String.fromCharCode(65 + oIdx)}:</label>
+                                <input type="text" class="input-edit-q" value="${opt}" onchange="examData.pg[${idx}].options[${oIdx}] = this.value; saveExamState();">
+                            </div>
+                        `).join('')}
+                    </div>
+                    <div style="margin-top:5px;">
+                        <label><strong>Kunci Jawaban PG:</strong></label>
+                        <select onchange="examData.pg[${idx}].key = this.value; saveExamState();">
+                            ${['A','B','C','D','E'].map(o => `<option value="${o}" ${item.key === o ? 'selected':''}>${o}</option>`).join('')}
+                        </select>
+                    </div>
+                </div>
+            `;
+        });
+        html += '</div>';
+
+        html += '<div class="card-section"><h4>2. Edit Pernyataan & Kunci Menjodohkan (15 Soal)</h4>';
+        examData.jodoh.forEach((item, idx) => {
+            html += `
+                <div class="question-card" style="border-left: 3px solid var(--accent);">
+                    <strong>Soal Menjodohkan No ${idx + 1}:</strong>
+                    <div class="grid-2" style="margin-top:5px;">
+                        <div>
+                            <label style="font-size:0.8em;">Pernyataan (Kolom Kiri):</label>
+                            <input type="text" class="input-edit-q" value="${item.left}" onchange="examData.jodoh[${idx}].left = this.value; saveExamState();">
+                        </div>
+                        <div>
+                            <label style="font-size:0.8em;">Pilihan Pasangan (${String.fromCharCode(65 + idx)}):</label>
+                            <input type="text" class="input-edit-q" value="${item.rightOptions[idx]}" onchange="updateAllRightOptions(${idx}, this.value)">
+                        </div>
+                    </div>
+                    <div style="margin-top:5px;">
+                        <label><strong>Kunci Pasangan:</strong></label>
+                        <select onchange="examData.jodoh[${idx}].key = this.value; saveExamState();">
+                            ${Array.from({length: 15}, (_, j) => String.fromCharCode(65 + j)).map(o => `<option value="${o}" ${item.key === o ? 'selected':''}>[ ${o} ]</option>`).join('')}
+                        </select>
+                    </div>
+                </div>
+            `;
+        });
+        html += '</div>';
+
+        html += '<div class="card-section"><h4>3. Edit Pernyataan & Kunci Benar / Salah (10 Soal)</h4>';
+        examData.bs.forEach((item, idx) => {
+            html += `
+                <div class="question-card" style="border-left: 3px solid var(--success);">
+                    <strong>Soal Benar / Salah No ${idx + 1}:</strong>
+                    <input type="text" class="input-edit-q" value="${item.q}" onchange="examData.bs[${idx}].q = this.value; saveExamState();">
+                    <div style="margin-top:5px;">
+                        <label><strong>Kunci Jawaban:</strong></label>
+                        <select onchange="examData.bs[${idx}].key = this.value; saveExamState();">
+                            <option value="B" ${item.key === 'B' ? 'selected':''}>Benar (B)</option>
+                            <option value="S" ${item.key === 'S' ? 'selected':''}>Salah (S)</option>
+                        </select>
+                    </div>
+                </div>
+            `;
+        });
+        html += '</div>';
+
+        editContainer.innerHTML = html;
+    }
+
+    function updateAllRightOptions(index, newValue) {
+        examData.jodoh.forEach(item => { item.rightOptions[index] = newValue; });
+        saveExamState();
+    }
+
+    function saveExamState() {
+        localStorage.setItem('examDataUAS_v8', JSON.stringify(examData));
+        renderExam();
+    }
+
+    function switchSection(secId, evt) {
+        ['pg','jodoh','bs','edit','rekap'].forEach(s => document.getElementById('sec-' + s).style.display = 'none');
+        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+        document.getElementById('sec-' + secId).style.display = 'block';
+        if(evt) evt.currentTarget.classList.add('active');
+        if(secId === 'edit') renderEditPanel();
+    }
+
+    function hitungKoreksiHasil() {
+        let selectIdx = document.getElementById('siswaSelect').value;
+        if (selectIdx === "") { alert("Pilih Nama Siswa!"); return; }
+
+        let unassigned = [];
+        examData.pg.forEach((item, idx) => { if(!document.querySelector(`input[name="pg_${item.id}"]:checked`)) unassigned.push(`PG No ${idx+1}`); });
+        examData.jodoh.forEach((item, idx) => { if(!document.querySelector(`select[name="jodoh_${item.id}"]`).value) unassigned.push(`Jodoh No ${idx+1}`); });
+        examData.bs.forEach((item, idx) => { if(!document.querySelector(`input[name="bs_${item.id}"]:checked`)) unassigned.push(`B/S No ${idx+1}`); });
+
+        if (unassigned.length > 0) {
+            alert("⚠️ Siswa BELUM BISA Rekap Nilai!\nHarap selesaikan seluruh soal terlebih dahulu:\n\n" + unassigned.slice(0, 10).join(', ') + (unassigned.length > 10 ? ' ...dan lainnya' : ''));
+            return;
+        }
+
+        let details = [];
+        let countPG = 0, countJodoh = 0, countBS = 0;
+
+        examData.pg.forEach(item => {
+            let sel = document.querySelector(`input[name="pg_${item.id}"]:checked`);
+            let isCorrect = sel && sel.value === item.key;
+            if(isCorrect) countPG++;
+            details.push(isCorrect);
+        });
+
+        examData.jodoh.forEach(item => {
+            let sel = document.querySelector(`select[name="jodoh_${item.id}"]`);
+            let isCorrect = sel && sel.value === item.key;
+            if(isCorrect) countJodoh++;
+            details.push(isCorrect);
+        });
+
+        examData.bs.forEach(item => {
+            let sel = document.querySelector(`input[name="bs_${item.id}"]:checked`);
+            let isCorrect = sel && sel.value === item.key;
+            if(isCorrect) countBS++;
+            details.push(isCorrect);
+        });
+
+        let valPG = countPG * 3;
+        let valJodoh = countJodoh * 3;
+        let valBS = countBS * 1;
+        let totalNilai = valPG + valJodoh + valBS;
+
+        let sNama = daftarSiswa[selectIdx].nama;
+        let sKelas = daftarSiswa[selectIdx].kelas;
+        let sNIS = daftarSiswa[selectIdx].nis;
+
+        document.getElementById('resNama').innerText = sNama;
+        document.getElementById('resKelas').innerText = sKelas;
+        document.getElementById('resNIS').innerText = sNIS;
+        document.getElementById('scorePG').innerText = countPG;
+        document.getElementById('valPG').innerText = valPG;
+        document.getElementById('scoreJodoh').innerText = countJodoh;
+        document.getElementById('valJodoh').innerText = valJodoh;
+        document.getElementById('scoreBS').innerText = countBS;
+        document.getElementById('valBS').innerText = valBS;
+        document.getElementById('scorePercentage').innerText = totalNilai;
+
+        document.getElementById('resultBox').style.display = 'block';
+
+        simpanKeRekapMatriks({ nama: sNama, kelas: sKelas, nis: sNIS, details, totalNilai });
+    }
+
+    function simpanKeRekapMatriks(dataObj) {
+        let idx = rekapNilaiAll.findIndex(r => r.nis === dataObj.nis);
+        if (idx !== -1) rekapNilaiAll[idx] = dataObj;
+        else rekapNilaiAll.push(dataObj);
+
+        localStorage.setItem('rekapNilaiUAS_v8_rekap', JSON.stringify(rekapNilaiAll));
+        renderRekapTable();
+    }
+
+    function renderRekapTable() {
+        let tbody = document.getElementById('rekapTableBody');
+        let selectedKelas = document.getElementById('filterKelasRekap').value;
+        
+        document.getElementById('printKelasLabel').innerText = selectedKelas === "ALL" ? "Semua Kelas" : selectedKelas;
+        document.getElementById('printMapelLabel').innerText = document.getElementById('mapelNama').value;
+        document.getElementById('printGuruFooter').innerText = document.getElementById('guruNama').value || "__________________________";
+
+        let filtered = rekapNilaiAll.filter(r => selectedKelas === "ALL" || r.kelas === selectedKelas);
+
+        tbody.innerHTML = '';
+        if (filtered.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="44">Belum ada data nilai tersimpan untuk kelas ini.</td></tr>';
+            return;
+        }
+
+        filtered.forEach((item, idx) => {
+            let cellsDetail = item.details.map(isTrue => 
+                `<td class="${isTrue ? 'cell-true' : 'cell-false'}">${isTrue ? '✓' : '✗'}</td>`
+            ).join('');
+
+            tbody.innerHTML += `
+                <tr>
+                    <td>${idx + 1}</td>
+                    <td style="text-align:left; font-weight:bold;">${item.nama}</td>
+                    <td>${item.nis}</td>
+                    ${cellsDetail}
+                    <td style="font-weight:bold; font-size:9pt; background:#f1f5f9;">${item.totalNilai}</td>
+                </tr>
+            `;
+        });
+    }
+
+    function loadRekapFromStorage() {
+        let saved = localStorage.getItem('rekapNilaiUAS_v8_rekap');
+        if (saved) {
+            rekapNilaiAll = JSON.parse(saved);
+            renderRekapTable();
+        }
+    }
+
+    function resetRekapNilai() {
+        if (confirm("Hapus seluruh data rekap nilai?")) {
+            rekapNilaiAll = [];
+            localStorage.removeItem('rekapNilaiUAS_v8_rekap');
+            renderRekapTable();
+        }
+    }
+
+    function downloadRekapCSV() {
+        if (rekapNilaiAll.length === 0) return alert("Data Kosong!");
+        let csv = "No,Nama Siswa,Kelas,NIS," + Array.from({length:40}, (_,i)=>`S${i+1}`).join(',') + ",Nilai Akhir\n";
+        rekapNilaiAll.forEach((r, i) => {
+            let statusArr = r.details.map(d => d ? "1" : "0").join(',');
+            csv += `${i+1},"${r.nama}","${r.kelas}","${r.nis}",${statusArr},${r.totalNilai}\n`;
+        });
+        let link = document.createElement("a");
+        link.href = "data:text/csv;charset=utf-8," + encodeURI(csv);
+        link.download = "Rekap_Detail_UAS_SMAN63.csv";
+        link.click();
+    }
+
+    function exportDataJSON() {
+        let dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({ examData, daftarSiswa }));
+        let a = document.createElement('a');
+        a.href = dataStr;
+        a.download = "Data_UAS_SMAN63.json";
+        a.click();
+    }
+
+    function importDataJSON(e) {
+        let reader = new FileReader();
+        reader.onload = function(evt) {
+            let imported = JSON.parse(evt.target.result);
+            if(imported.examData) {
+                examData = imported.examData;
+                saveExamState();
+            }
+            if(imported.daftarSiswa) {
+                daftarSiswa = imported.daftarSiswa;
+                localStorage.setItem('daftarSiswaUAS_v8', JSON.stringify(daftarSiswa));
+            }
+            populateSiswaDropdown();
+            renderEditSiswaGrid();
+            renderExam();
+            renderEditPanel();
+            alert("Data Berhasil Diimpor!");
+        };
+        reader.readAsText(e.target.files[0]);
+    }
+</script>
+</body>
+</html>
